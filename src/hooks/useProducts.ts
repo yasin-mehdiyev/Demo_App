@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Product } from "../models/api/Product/Product";
 // Models
 import { Products } from "../models/api/Product/Products";
 // Services
@@ -10,10 +11,16 @@ const useProducts = () => {
   const dispatch = useDispatch<any>();
   const products: any = useSelector(selectProductSlice);
   const [loading, setLoading] = useState<boolean>(false);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const [isChange, setIsChange] = useState<boolean>(false);
 
   return {
     loading,
+    isFiltered,
+    isChange,
     products,
+    filteredProducts,
     setLoading: (payload: boolean) => {
         setLoading(payload);
     },
@@ -33,10 +40,16 @@ const useProducts = () => {
         }, 250);
       }
     },
-    getFilteredProduct: (rate: number) => {
+    getFilteredProduct: (value: number, key: string) => {
       try {
-        const filteredProduct = products.filter((item: any) => Math.round(item.rating) === rate);
-        dispatch(setAllProducts(filteredProduct));
+        if (value && value !== 0) {
+          const filteredProduct = products.filter((item: any) => Math.round(item[key]) === value);
+          setFilteredProducts(filteredProduct);
+        } else {
+          setFilteredProducts(products);
+        }
+        setIsFiltered(!isFiltered);
+        setIsChange(true);
       } catch (error) {
         console.log(error);
       } 

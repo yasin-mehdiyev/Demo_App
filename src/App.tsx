@@ -1,42 +1,44 @@
-import { FC, useEffect, useLayoutEffect, useState } from 'react'
-import { useDispatch } from "react-redux";
+import { FC, useLayoutEffect } from 'react'
 // Components
 import Container from './components/layout/Container';
 import ProductList from './components/products/ProductList';
+// Helpers
+import { rates } from './helpers/constants';
 // Custom Hooks
 import useProducts from './hooks/useProducts'
 
 const App : FC = () => {
-  const dispatch = useDispatch<any>();
-  const { products, getProducts, getFilteredProduct } = useProducts();
+  const { products, isFiltered, isChange,  filteredProducts, getProducts, getFilteredProduct } = useProducts();
 
   useLayoutEffect(() => {
     getProducts();
-  }, [dispatch]);
-  
+  }, [isFiltered]);
 
-  const rates: Array<number> = [1,2,3,4,5];
-
-  const handleFilterRate = (e: any): void => {
-    const selectedRate = +e.target.value;
-    getFilteredProduct(selectedRate);
+  const handleFilterRate = (e: any, key: string): void => {
+    const value = +e.target.value;
+    getFilteredProduct(value, key);
   };
-
-  console.log('selectedRate: ', products);
 
   return (
     <Container>
-      <select onChange={handleFilterRate}>
-        {
-          rates.length && (
-            rates.map((rate: number, index: number) => (
-              <option key={index}>{rate}</option>
-            ))
-          )
-        }
-        <hr />
-      </select>
-      <ProductList allProducts={products} />
+      <div className="mb-3 mt-3">
+        <span>Ratings: </span>
+        <select onChange={(e: any) => handleFilterRate(e, "rating")}>
+          {
+            rates.length && (
+              rates.map((rate: number, index: number) => (
+                <option key={index}>{rate}</option>
+              ))
+            )
+          }
+          <hr />
+        </select>
+      </div>
+      <div className="mb-3 mt-3">
+          <span>Price Filter: </span>
+          <input type="number" min="0" onChange={(e: any) => handleFilterRate(e, "price")} />
+      </div>
+      <ProductList allProducts={!isChange ? products : filteredProducts} />
     </Container>
   )
 }

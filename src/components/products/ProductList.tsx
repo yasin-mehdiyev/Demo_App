@@ -15,12 +15,14 @@ const ProductList : FC<ProductProps> = ({ allProducts }) => {
   return (
     <Row>
       {
-        allProducts?.length && (
+        allProducts?.length ? (
             allProducts?.map((item: any) => (
                 <Col colName="col-md-4" key={item.id}>
                     <ProductItem { ...item } />
                 </Col>
             ))
+        ) : (
+          <p>Data not found</p>
         )
       }
     </Row>
